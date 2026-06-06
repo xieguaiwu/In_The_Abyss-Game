@@ -58,6 +58,10 @@ void hd();
 void hh();
 void fh();
 
+// 章节预留入口（原 Abyss.cpp 中存在为空函数）
+void b1();   // 第二章独立剧情
+void c1();   // 第三章独立剧情
+
 // 调试
 void debug();
 

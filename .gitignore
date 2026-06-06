@@ -1,7 +1,9 @@
 # 编译输出
 Abyss
+Abyss-debug
 Abyss.exe
 obj/
+obj/debug/
 
 # 编辑器
 .vscode/
@@ -18,3 +20,6 @@ Thumbs.db
 
 # COPR 打包指南（开发文档，不上传）
 copr_packaging.md
+
+# Session context（自动生成的会话上下文快照）
+session_context.md
