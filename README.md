@@ -84,7 +84,7 @@ The game tells the story of an ordinary office worker who, after accidentally en
 
 ## Compilation and Running
 
-### Linux
+### Unix (Linux / macOS)
 
 ```bash
 make          # Build (release)

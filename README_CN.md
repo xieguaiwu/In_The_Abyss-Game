@@ -82,7 +82,7 @@
 
 ## 编译与运行
 
-### Linux
+### Unix（Linux / macOS）
 
 ```bash
 make          # 编译（release）

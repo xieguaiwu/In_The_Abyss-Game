@@ -1,7 +1,7 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
-// 跨平台支持头文件 - 支持Windows和Linux
+// 跨平台支持头文件 - 支持Windows、macOS和Linux
 // C++17标准
 
 #include <iostream>
@@ -13,8 +13,16 @@
 #define PLATFORM_WINDOWS
 #include <windows.h>
 #include <conio.h>
+#elif defined(__APPLE__)
+#define PLATFORM_MAC
+#define PLATFORM_POSIX
+#include <termios.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
 #else
 #define PLATFORM_LINUX
+#define PLATFORM_POSIX
 #include <termios.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -147,7 +155,7 @@ inline void set_color(int foreground, int background = 0) {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
 	                        FOREGROUND_INTENSITY | win_fg | win_bg);
 #else
-	// Linux使用ANSI转义序列
+	// Unix/POSIX使用ANSI转义序列
 	std::cout << "\033[" << foreground << ";" << (background + 10) << "m";
 	std::cout.flush();
 #endif
@@ -360,15 +368,15 @@ inline void full_screen() {
 	LONG l_WinStyle = GetWindowLong(hwnd, GWL_STYLE);
 	SetWindowPos(hwnd, HWND_TOP, 0, 0, cx, cy, 0);
 #endif
-	// Linux下全屏需要终端支持，这里不做处理
+	// macOS/Linux下全屏需要终端支持，这里不做处理
 }
 
 } // namespace platform
 
 // ============ getch() 实现 ============
-#ifdef PLATFORM_LINUX
+#ifdef PLATFORM_POSIX
 namespace {
-// Linux下getch的实现
+// POSIX下getch的实现
 inline int getch_impl() {
 	struct termios oldattr, newattr;
 	int ch;
@@ -385,7 +393,7 @@ inline int getch_impl() {
 
 	ch = getchar();
 
-	// 检查方向键（Linux下方向键是3个字符的序列 ESC [ A/B/C/D）
+	// 检查方向键（POSIX下方向键是3个字符的序列 ESC [ A/B/C/D）
 	if (ch == 27) { // ESC
 		// 切换到非阻塞模式读取后续字符
 		newattr.c_cc[VMIN] = 0;
@@ -418,7 +426,7 @@ inline int getch_impl() {
 	return ch;
 }
 }
-// 在Linux下重新定义getch
+// 在POSIX下重新定义getch
 #define getch getch_impl
 #endif
 
@@ -437,7 +445,7 @@ inline int getch_impl() {
 #define down 'P'
 
 // Sleep兼容
-#ifdef PLATFORM_LINUX
+#ifdef PLATFORM_POSIX
 #define Sleep(ms) platform::sleep_ms(ms)
 #endif
 
