@@ -3,6 +3,7 @@
 #include "functions.h"
 #include "print.h"
 #include "story.h"
+#include "game_state.h"
 
 // ============================================================
 // 第二章：办公室与楼梯间
@@ -130,7 +131,7 @@ void a2_1() {
 			text("你把文件交给部门经理，后者决定为你增加工作量"); break;
 		}
 		else if (key == 'B' || key == 'b') {
-			if (shame == false) {
+			if (!GameState::instance().check_flag("shame")) {
 				text("上司接受了报告，你庆幸他并没有看出端倪");
 			}
 			else {
@@ -138,7 +139,7 @@ void a2_1() {
 				text("【部门经理】你到底想要干什么？先是恬不知耻地在办公室里脱内裤又突然仿佛就要哭了一样，然后又是这个！");
 				text("【部门经理】别让我再看到你发疯的样子，要不然你也不用来见我了！");
 				text("你的上司又怒气冲冲地回到了办公室里。你希望乘坐肥猪高速公路的末班车离开这栋写字楼。");
-				text("解锁成就【肥猪高速公路】！"); achi = achi + 1;
+				text("解锁成就【肥猪高速公路】！"); GameState::instance().visit("achievements");
 			}
 			break;
 		}

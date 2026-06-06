@@ -5,6 +5,7 @@
 #include "functions.h"
 #include "print.h"
 #include "story.h"
+#include "game_state.h"
 
 // ============================================================
 // 第一章：在起初，地狱乏火与死之人间
@@ -76,7 +77,7 @@ void a1aa() {
 	text("你走向工位……", 1);
 	text("来自亘古的神秘向你低吼……");
 	text("人人都渴望着一抹轻易舐入生活的平庸神性");
-	hyphen(); checkpoint1 = true;
+	hyphen(); GameState::instance().set_flag("checkpoint1");
 }
 
 void a1a() {
@@ -108,7 +109,7 @@ void a1a() {
 			text("那今后提起游戏你必将坠入冰冷的深渊（在 深 渊），体验绝望的后悔与没落感（因为那时候《在深渊》的制作人已经跑路了）。玩游戏不玩《在深渊》和《INFERNO》，就像看四大名著不看《海绵宝宝》，说命这个人文学造诣和自我修养不足，他理解不了这种内在的阳春白雪的高雅艺术，他只能看到外表的辞藻堆砌，参不透其中深奥的精神内核，他整个人的个人层次就卡在这里了，只能度过一个失！败！的！人！生！");
 			platform::system_color(0x18); Swait(); city(); platform::system_color(0x18); Swait(); city(); platform::system_color(0x18); Swait(); city();
 			text("【同事】啊哈哈哈哈哈哈！！！Failure！！！（想想看这里是在说谁——不不不！不要关游戏！）");
-			under_abyss = true;
+			GameState::instance().set_flag("under_abyss");
 			break;
 		}
 		else if (key == 'C' || key == 'c') break;
@@ -135,7 +136,7 @@ void a1a() {
 				key = getch();
 				if (key == up) {
 					if (random_val == 2) {
-						shame = true;
+						GameState::instance().set_flag("shame");
 						text("【判定成功！】你脱下了内裤。人们路过你，有人对你指指点点，但你感到十分自信");
 						text("过了一小会，你开始感到羞耻");
 						text("你希望如蛆虫般钻入脊髓的深处");
@@ -177,11 +178,10 @@ void a1a() {
 }
 
 void a1() {
-	srand(time(NULL));
 	platform::clear_screen(); platform::system_color(0x07);
 	std::cout << "第一章 ";
 	colorc(1); std::cout << Chap1 << "\n"; colorc(7);
-	if (checkpoint1 == true) {
+	if (GameState::instance().check_flag("checkpoint1")) {
 		std::cout << "已读取检查点（↑进入检查点 ↓重新开始本章进度）\n";
 		while (1) {
 			key = getch();

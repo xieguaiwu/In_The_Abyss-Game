@@ -3,6 +3,9 @@
 #include "functions.h"
 #include "print.h"
 #include "story.h"
+#include "game_state.h"
+#include "room_registry.h"
+#include "random_event.h"
 
 // ============================================================
 // 第三章：地狱
@@ -11,9 +14,6 @@
 int s21 = 1;
 bool n = false, s = false, e = false, w = false;
 
-int sy_times = 0, ba_times = 0, qd_times = 0, dd_times = 0;
-int hd_times = 0, hh_times = 0, fh_times = 0;
-bool look_clear = false;
 
 void reborn() {
 	s21 = 1;
@@ -26,22 +26,22 @@ void where() {
 	while (1) {
 		if (s21 == 4 + 1) break;
 		if (s21 == 1) {
-			if (rooms[Prooms + 1] != "") {
+			if (rooms.count(Prooms + 1) > 0) {
 				std::cout << "N.向北走\n"; n = true;
 			}
 		}
 		else if (s21 == 2) {
-			if (rooms[Prooms - 1] != "") {
+			if (rooms.count(Prooms - 1) > 0) {
 				std::cout << "S.向南走\n"; s = true;
 			}
 		}
 		else if (s21 == 3) {
-			if (rooms[Prooms - 0.1] != "") {
+			if (rooms.count(Prooms - 0.1) > 0) {
 				std::cout << "W.向西走\n"; w = true;
 			}
 		}
 		else if (s21 == 4) {
-			if (rooms[Prooms + 0.1] != "") {
+			if (rooms.count(Prooms + 0.1) > 0) {
 				std::cout << "E.向东走\n"; e = true;
 			}
 		}
@@ -113,20 +113,20 @@ void checkpoint(int place) {
 // ============================================================
 
 void sy() {
-	if (look_clear == false) text("在深渊，万物沉浸在黑暗里……");
+	if (!GameState::instance().check_flag("look_clear")) text("在深渊，万物沉浸在黑暗里……");
 	else {
 		text("-黑暗和烈火赐给你乌黑的眼，如今它们冰冷如霜-");
 		text("但我（你）不愿再找寻……");
 	}
 	text("……");
-	if (sy_times == 0) {
+	if (GameState::instance().visited("sy") == 0) {
 		puts("继续等待吗？（↑继续等 ↓离开）");
 		while (1) {
 			key = getch();
 			if (key == up) {
 				text("你继续等……");
 				text("-黑暗和烈火赐给你乌黑的眼，如今它们冰冷如霜-", 1);
-				look_clear = true;
+				GameState::instance().set_flag("look_clear");
 				platform::system_color(0x07); colorc(1);
 				text("		在我半幽半暗似要消散的身体的南方传来阵阵花香", 1);
 				go(4, -2);
@@ -152,7 +152,7 @@ void sy() {
 				platform::sleep_ms(3000);
 				light_hell();
 				text("-但是你眨眼了-");
-				text("解锁成就【不要……眨眼】", 1); achi = achi + 1;
+				text("解锁成就【不要……眨眼】", 1); GameState::instance().visit("achievements");
 				break;
 			}
 			else if (key == down) break;
@@ -162,7 +162,7 @@ void sy() {
 
 void ba() {
 	text("空旷的彼岸花丛，羊水般的花香勾起死亡的诱惑……");
-	if (ba_times != 0) text("除此之外一无所有");
+	if (GameState::instance().visited("ba") > 0) text("除此之外一无所有");
 	else {
 		text("这是第二次死亡的诱惑吗？");
 		text("-我是谁？-");
@@ -173,16 +173,16 @@ void ba() {
 
 void qd() {
 	text("-秦广王殿-前殿-");
-	if (qd_times == 0) {
+	if (GameState::instance().visited("qd") == 0) {
 		text("十余个赤身鬼卒拖着身后的破铜烂铁（与身体缠成一团，仿佛起初便是一体。铁丝网和不知名的生锈仪器皆来自人间的荒原），在其周身，金属的啸鸣不绝于耳");
 		text("血液似的铁锈的气味缠绕其中，铁蓝色皮肤轻慢地盖着其下殷红的肌肉。浓烟自通往大殿的铁门升起，缠绕着宇宙星辰……");
 	}
-	else if (qd_times == 1) {
+	else if (GameState::instance().visited("qd") == 1) {
 		text("鬼卒们与身上的金属呆坐在墙边");
 		text("他们在等待着什么……");
 		text("在无望地等待着什么……");
 	}
-	else if (qd_times == 2) {
+	else if (GameState::instance().visited("qd") == 2) {
 		text("再回来看时，许多原先蹲在墙边的鬼卒已经烟消云散，和自大殿散开的烟雾融为一体……");
 	}
 	else {
@@ -191,7 +191,7 @@ void qd() {
 }
 
 void dd() {
-	if (dd_times == 0) {
+	if (GameState::instance().visited("dd") == 0) {
 		text("恍然间进了这座幽暗的大殿，青蓝色蟒蛇体内稠密的深蓝毒素如尸骨般密铺在灯火的微弱之芒交织碰撞磨合而成的烟尘里，而这烟尘的本体又源自大殿阴影处的角落");
 		text("有阴影之存在，则有光芒之凸现：");
 		text("阎王啊脑袋浑圆，在烟气的笼罩遮盖中仿佛另一个光源，静坐杳无气息，漆黑一片的身体庞大而使人胆寒……");
@@ -225,7 +225,7 @@ void dd() {
 		text("……");
 		text("【一殿阎王】 我需要你……之后再回来这里找我");
 	}
-	else if (dd_times == 1) {
+	else if (GameState::instance().visited("dd") == 1) {
 		text("不散的烟尘……在你接近阎王后他才开始呼吸。愈发沉重的喘息。");
 		text("【一殿阎王】 你回来了。");
 		text("【一殿阎王】 在你能找到回去的办法之前，我需要你为我工作");
@@ -243,20 +243,20 @@ void dd() {
 }
 
 void hd() {
-	if (hd_times == 0) {
+	if (GameState::instance().visited("hd") == 0) {
 		// 后殿 — 为空，等待后续内容
 	}
 }
 
 void hh() {
-	if (hh_times == 0) {
+	if (GameState::instance().visited("hh") == 0) {
 		// 后花园 — 为空，等待后续内容
 	}
 }
 
 void fh() {
-	if (fh_times == 0) {
-		if (qd_times == 1) {
+	if (GameState::instance().visited("fh") == 0) {
+		if (GameState::instance().visited("qd") == 1) {
 			text("你应该回前殿看看……");
 		}
 	}
@@ -279,39 +279,47 @@ void a3_hell_define() {
 
 void a3_hell() {
 	while (true) {
+		// 检查退出键
+		if (key == 'Q' || key == 'q') {
+			std::cout << "返回主菜单……\n";
+			pause_game(1);
+			return;
+		}
 		light_hell();
 		a3_hell_print();
 		pause_game(); hyphen();
 		std::cout << "你正位于【" << rooms[Prooms] << "】\n\n";
 		if (rooms[Prooms] == rooms[0]) {
-			sy(); sy_times++;
+			sy(); GameState::instance().visit("sy");
 			a3_hell_print();
 		}
 		else if (rooms[Prooms] == rooms[-1]) {
-			ba(); ba_times++;
+			ba(); GameState::instance().visit("ba");
 			std::cout << "\n\n";
 		}
 		else if (rooms[Prooms] == rooms[-2]) {
-			qd(); qd_times++;
+			qd(); GameState::instance().visit("qd");
 			std::cout << "\n\n";
 		}
 		else if (rooms[Prooms] == rooms[-3]) {
-			dd(); dd_times++;
+			dd(); GameState::instance().visit("dd");
 			std::cout << "\n\n";
 		}
 		else if (rooms[Prooms] == rooms[-4]) {
-			hd(); hd_times++;
+			hd(); GameState::instance().visit("hd");
 			std::cout << "\n\n";
 		}
-		else if (rooms[Prooms] == rooms[-3.5]) {
-			hh(); hh_times++;
+		else if (rooms[Prooms] == rooms[-4.1]) {
+			hh(); GameState::instance().visit("hh");
 			std::cout << "\n\n";
 		}
 		else if (rooms[Prooms] == rooms[-4.5]) {
-			fh(); fh_times++;
+			fh(); GameState::instance().visit("fh");
 			std::cout << "\n\n";
 		}
 		where();
+		GameState::instance().turn_count++;
+		RandomEventSystem::instance().try_trigger();
 	}
 }
 

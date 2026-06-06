@@ -10,6 +10,7 @@
 #include "game_state.h"
 #include "room_registry.h"
 #include "scene_registry.h"
+#include "ending_tracker.h"
 
 char key;
 
@@ -75,9 +76,12 @@ void choice() {
 	platform::system_color(0xB1);
 	pause_game(1);
 	register_legacy_scenes();
+	GameState::instance();
+	EndingTracker::instance();
 }
 
 int main() {
+	srand(time(nullptr));
 	while (true) {
 		if (ingame == false) choice();
 		platform::system_color(0xC7);

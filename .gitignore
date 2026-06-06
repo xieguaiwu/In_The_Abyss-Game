@@ -23,3 +23,6 @@ copr_packaging.md
 
 # Session context（自动生成的会话上下文快照）
 session_context.md
+
+# 本地中文文档（不上传）
+doc/

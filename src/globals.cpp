@@ -2,14 +2,10 @@
 
 // ============ 全局变量定义 ============
 int random_val;
-bool play_open;
-
 std::map<float, std::string> rooms;
 std::map<int, char> alph;
 std::map<int, std::string> dire;
 float Prooms;
-
-std::stringstream chan;
 
 const int Tchap = 3;
 bool chap1 = true, chap2 = true, chap3 = true;
