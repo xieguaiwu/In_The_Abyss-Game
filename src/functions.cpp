@@ -78,42 +78,42 @@ void open() {
 	std::cout << "（按任意键跳过开场动画）\n";
 
 	// === 第一行 ===
-	platform::system_color(0x47);
+	platform::system_color(0x06);
 	puts("[           -在深渊-           ]");
 	platform::sleep_ms(500); if (check_skip()) return;
-	platform::system_color(0x74);
+	platform::system_color(0x07);
 	platform::sleep_ms(20);  if (check_skip()) return;
-	platform::system_color(0x47);
+	platform::system_color(0x06);
 	platform::sleep_ms(300); if (check_skip()) return;
-	platform::system_color(0x74);
+	platform::system_color(0x07);
 	platform::sleep_ms(20);  if (check_skip()) return;
-	platform::system_color(0x47);
+	platform::system_color(0x06);
 	platform::sleep_ms(300); if (check_skip()) return;
 	platform::clear_screen();
 
 	// === 第二行 ===
 	puts("[         -In the Abyss-         ]");
 	platform::sleep_ms(500); if (check_skip()) return;
-	platform::system_color(0x74);
+	platform::system_color(0x07);
 	platform::sleep_ms(20);  if (check_skip()) return;
-	platform::system_color(0x47);
+	platform::system_color(0x06);
 	platform::sleep_ms(300); if (check_skip()) return;
-	platform::system_color(0x74);
+	platform::system_color(0x07);
 	platform::sleep_ms(20);  if (check_skip()) return;
-	platform::system_color(0x47);
+	platform::system_color(0x06);
 	platform::sleep_ms(300); if (check_skip()) return;
 	platform::clear_screen();
 
 	// === 第三行 ===
 	puts("[     Made By 齂怪物、地有小到中雨     ]");
 	platform::sleep_ms(500); if (check_skip()) return;
-	platform::system_color(0x74);
+	platform::system_color(0x07);
 	platform::sleep_ms(20);  if (check_skip()) return;
-	platform::system_color(0x47);
+	platform::system_color(0x06);
 	platform::sleep_ms(300); if (check_skip()) return;
-	platform::system_color(0x74);
+	platform::system_color(0x07);
 	platform::sleep_ms(20);  if (check_skip()) return;
-	platform::system_color(0x47);
+	platform::system_color(0x06);
 	platform::sleep_ms(300); if (check_skip()) return;
 	platform::clear_screen();
 }

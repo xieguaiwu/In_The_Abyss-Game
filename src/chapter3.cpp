@@ -23,56 +23,55 @@ void reborn() {
 void where() {
 	reborn();
 	std::cout << "你要去哪里？（按N/S/W/E选择）\n";
-	while (1) {
-		if (s21 == 4 + 1) break;
-		if (s21 == 1) {
-			if (rooms.count(Prooms + 1) > 0) {
+	// 检查四个方向：N:+10, S:-10, W:-1, E:+1（整数坐标，无精度问题）
+	for (int i = 1; i <= 4; i++) {
+		if (i == 1) {
+			if (rooms.count(Prooms + 10) > 0) {
 				std::cout << "N.向北走\n"; n = true;
 			}
 		}
-		else if (s21 == 2) {
-			if (rooms.count(Prooms - 1) > 0) {
+		else if (i == 2) {
+			if (rooms.count(Prooms - 10) > 0) {
 				std::cout << "S.向南走\n"; s = true;
 			}
 		}
-		else if (s21 == 3) {
-			if (rooms.count(Prooms - 0.1) > 0) {
+		else if (i == 3) {
+			if (rooms.count(Prooms - 1) > 0) {
 				std::cout << "W.向西走\n"; w = true;
 			}
 		}
-		else if (s21 == 4) {
-			if (rooms.count(Prooms + 0.1) > 0) {
+		else if (i == 4) {
+			if (rooms.count(Prooms + 1) > 0) {
 				std::cout << "E.向东走\n"; e = true;
 			}
 		}
-		s21++;
 	}
 	while (1) {
 		key = getch();
 		if (key == 'N' || key == 'n') {
 			if (n == true) {
-				Prooms++;
+				Prooms += 10;
 				text("你向北走……（按任意键继续）", 1);
 				break;
 			}
 		}
 		else if (key == 'S' || key == 's') {
 			if (s == true) {
-				Prooms = Prooms - 1;
+				Prooms -= 10;
 				text("你向南走……（按任意键继续）", 1);
 				break;
 			}
 		}
 		else if (key == 'W' || key == 'w') {
 			if (w == true) {
-				Prooms = Prooms - 0.1;
+				Prooms -= 1;
 				text("你向西走……（按任意键继续）", 1);
 				break;
 			}
 		}
 		else if (key == 'E' || key == 'e') {
 			if (e == true) {
-				Prooms = Prooms + 0.1;
+				Prooms += 1;
 				text("你向东走……（按任意键继续）", 1);
 				break;
 			}
@@ -244,13 +243,23 @@ void dd() {
 
 void hd() {
 	if (GameState::instance().visited("hd") == 0) {
-		// 后殿 — 为空，等待后续内容
+		text("你进入后殿。幽暗的空间里，几根石柱擎着低矮的穹顶。");
+		text("墙角堆放着锈蚀的刑具，空气中飘散着陈旧的铁锈味。");
+		text("暂时没有什么特别的事情发生……");
+	}
+	else {
+		text("后殿依然沉寂，铁锈味弥漫在空气中。");
 	}
 }
 
 void hh() {
 	if (GameState::instance().visited("hh") == 0) {
-		// 后花园 — 为空，等待后续内容
+		text("后花园中，彼岸花盛开着，血色的花瓣在无风的深渊中安详静立。");
+		text("花丛深处似乎有微弱的光亮，但走近时便消散了。");
+		text("暂时没有什么特别的事情发生……");
+	}
+	else {
+		text("彼岸花依旧在虚无中绽开，仿佛时间在此凝固。");
 	}
 }
 
@@ -268,16 +277,18 @@ void fh() {
 
 void a3_hell_define() {
 	Prooms = 0;
+	// 使用整数坐标（×10 缩放），避免浮点精度问题
 	rooms[0] = "深渊";
-	rooms[-1] = "彼岸花丛";
-	rooms[-2] = "秦广王殿-前殿";
-	rooms[-3] = "秦广王殿-大殿";
-	rooms[-4] = "秦广王殿-后殿";
-	rooms[-4.1] = "后花园";
-	rooms[-5.1] = "地狱乏火";
+	rooms[-10] = "彼岸花丛";
+	rooms[-20] = "秦广王殿-前殿";
+	rooms[-30] = "秦广王殿-大殿";
+	rooms[-40] = "秦广王殿-后殿";
+	rooms[-41] = "后花园";
+	rooms[-51] = "地狱乏火";
 }
 
 void a3_hell() {
+	key = 0;  // 清除可能残留的 'Q'，防止从第二章切过来时立即退出
 	while (true) {
 		// 检查退出键
 		if (key == 'Q' || key == 'q') {
@@ -289,34 +300,43 @@ void a3_hell() {
 		light_hell();
 		a3_hell_print();
 		pause_game(); hyphen();
-		std::cout << "你正位于【" << rooms[Prooms] << "】\n\n";
-		if (rooms[Prooms] == rooms[0]) {
-			sy(); GameState::instance().visit("sy");
-			a3_hell_print();
+		// 使用整数坐标精准查找当前房间名称
+		auto it = rooms.find(Prooms);
+		if (it != rooms.end()) {
+			std::cout << "你正位于【" << it->second << "】\n\n";
+		} else {
+			std::cout << "你正位于【未知区域】\n\n";
 		}
-		else if (rooms[Prooms] == rooms[-1]) {
-			ba(); GameState::instance().visit("ba");
-			std::cout << "\n\n";
-		}
-		else if (rooms[Prooms] == rooms[-2]) {
-			qd(); GameState::instance().visit("qd");
-			std::cout << "\n\n";
-		}
-		else if (rooms[Prooms] == rooms[-3]) {
-			dd(); GameState::instance().visit("dd");
-			std::cout << "\n\n";
-		}
-		else if (rooms[Prooms] == rooms[-4]) {
-			hd(); GameState::instance().visit("hd");
-			std::cout << "\n\n";
-		}
-		else if (rooms[Prooms] == rooms[-4.1]) {
-			hh(); GameState::instance().visit("hh");
-			std::cout << "\n\n";
-		}
-		else if (rooms[Prooms] == rooms[-4.5]) {
-			fh(); GameState::instance().visit("fh");
-			std::cout << "\n\n";
+		// 使用 switch 分发，避免 operator[] 的副作用
+		switch (Prooms) {
+			case 0:
+				sy(); GameState::instance().visit("sy");
+				a3_hell_print();
+				break;
+			case -10:
+				ba(); GameState::instance().visit("ba");
+				std::cout << "\n\n";
+				break;
+			case -20:
+				qd(); GameState::instance().visit("qd");
+				std::cout << "\n\n";
+				break;
+			case -30:
+				dd(); GameState::instance().visit("dd");
+				std::cout << "\n\n";
+				break;
+			case -40:
+				hd(); GameState::instance().visit("hd");
+				std::cout << "\n\n";
+				break;
+			case -41:
+				hh(); GameState::instance().visit("hh");
+				std::cout << "\n\n";
+				break;
+			case -51:
+				fh(); GameState::instance().visit("fh");
+				std::cout << "\n\n";
+				break;
 		}
 		where();
 		GameState::instance().turn_count++;

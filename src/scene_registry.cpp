@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include "scene_registry.h"
+#include "functions.h"
 
 static std::vector<SceneDef> g_scenes;
 
@@ -32,9 +33,11 @@ void empty_scene_placeholder() {
 }
 
 void b1() {
-    // 第二章独立剧情——预留
+    std::cout << "第二章独立剧情 —— 即将推出，敬请期待。\n\n";
+    pause_game();
 }
 
 void c1() {
-    // 第三章独立剧情——预留
+    std::cout << "第三章独立剧情 —— 即将推出，敬请期待。\n\n";
+    pause_game();
 }

@@ -7,10 +7,10 @@
 
 // ============ 全局变量声明 ============
 extern int random_val;
-extern std::map<float, std::string> rooms;
+extern std::map<int, std::string> rooms;
 extern std::map<int, char> alph;
 extern std::map<int, std::string> dire;
-extern float Prooms;
+extern int Prooms;
 
 extern bool chap1, chap2, chap3;
 extern std::string Chap1, Chap2, Chap3;
