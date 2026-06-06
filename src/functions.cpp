@@ -45,7 +45,8 @@ int r(int min, int max) {
 }
 
 void city() {
-	platform::system_color(0x81);
+	// 标准白字黑底，阅读清晰不刺眼
+	platform::system_color(0x07);
 }
 
 void light() {
