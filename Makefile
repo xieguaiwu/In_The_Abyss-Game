@@ -38,12 +38,8 @@ endif
 CXXFLAGS := -std=c++17 -Wall -Wextra $(EXTRA_DEFS)
 OPTFLAGS := -O2
 
-# Debug 标志：UBSan 仅当编译器支持时启用
-ifeq ($(OS_NAME),linux)
-  DBGFLAGS := -O0 -g -DDEBUG -fsanitize=undefined
-else
-  DBGFLAGS := -O0 -g -DDEBUG
-endif
+# Debug 标志
+DBGFLAGS := -O0 -g -DDEBUG
 
 LDFLAGS  :=
 TARGET   := Abyss

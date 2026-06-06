@@ -283,6 +283,7 @@ void a3_hell() {
 		if (key == 'Q' || key == 'q') {
 			std::cout << "返回主菜单……\n";
 			pause_game(1);
+			ingame = true;
 			return;
 		}
 		light_hell();

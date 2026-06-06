@@ -12,12 +12,9 @@ extern std::map<int, char> alph;
 extern std::map<int, std::string> dire;
 extern float Prooms;
 
-extern const int Tchap;
 extern bool chap1, chap2, chap3;
 extern std::string Chap1, Chap2, Chap3;
 
-extern bool under_abyss, shame, checkpoint1;
-extern int achi;
 extern bool ingame;
 
 // ============ 函数声明 ============

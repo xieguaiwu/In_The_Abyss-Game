@@ -20,13 +20,13 @@ struct GameState {
     }
 
     int visit(const std::string& key) { return ++visit_count[key]; }
-    int visited(const std::string& key) {
+    int visited(const std::string& key) const {
         auto it = visit_count.find(key);
         return (it != visit_count.end()) ? it->second : 0;
     }
 
     void set_flag(const std::string& key, bool val = true) { flags[key] = val; }
-    bool check_flag(const std::string& key) {
+    bool check_flag(const std::string& key) const {
         auto it = flags.find(key);
         return it != flags.end() && it->second;
     }

@@ -112,6 +112,11 @@ int main() {
 				else if (key == 'C' || key == 'c') break;
 				hyphen();
 				a2();
+				if (ingame) {
+					ingame = false;
+					restart = true;
+					break;
+				}
 				break;
 			}
 			else if (key == 'B' || key == 'b') {
