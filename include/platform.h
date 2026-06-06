@@ -305,6 +305,44 @@ inline int getch_impl() {
 
 #endif // PLATFORM_POSIX
 
+// ============ 非阻塞按键检测（所有平台，用于跳过动画等） ============
+
+inline int try_getch() {
+#ifdef PLATFORM_WINDOWS
+	if (_kbhit()) return _getch();
+	return -1;
+#else
+	struct termios oldattr, newattr;
+	int ch = -1;
+	tcgetattr(STDIN_FILENO, &oldattr);
+	newattr = oldattr;
+	newattr.c_lflag &= ~(ICANON | ECHO);
+	newattr.c_cc[VMIN]  = 0;
+	newattr.c_cc[VTIME] = 0;
+	tcsetattr(STDIN_FILENO, TCSANOW, &newattr);
+	ch = getchar();
+	if (ch == EOF) ch = -1;
+	tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
+	return ch;
+#endif
+}
+
+inline void flush_input() {
+#ifdef PLATFORM_WINDOWS
+	while (_kbhit()) _getch();
+#else
+	struct termios oldattr, newattr;
+	tcgetattr(STDIN_FILENO, &oldattr);
+	newattr = oldattr;
+	newattr.c_lflag &= ~(ICANON | ECHO);
+	newattr.c_cc[VMIN]  = 0;
+	newattr.c_cc[VTIME] = 0;
+	tcsetattr(STDIN_FILENO, TCSANOW, &newattr);
+	while (getchar() != EOF) {}
+	tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
+#endif
+}
+
 // ============ 方向键映射 ============
 constexpr char KEY_LEFT  = 'K';
 constexpr char KEY_RIGHT = 'M';

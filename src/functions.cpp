@@ -54,46 +54,66 @@ void light() {
 }
 
 void hell() {
-	platform::system_color(0x47);
+	// 红底黑字：地狱氛围 + 高对比度可读
+	platform::system_color(0x40);
 }
 
 void light_hell() {
-	platform::system_color(0x57);
+	// 紫底黑字：地狱+微弱光线，仍保持清晰
+	platform::system_color(0x50);
 }
 
 void open() {
+	// 跳过检测辅助函数
+	auto check_skip = []() -> bool {
+		if (try_getch() != -1) {
+			flush_input();
+			platform::clear_screen();
+			platform::system_color(0x07);
+			return true;
+		}
+		return false;
+	};
+
+	std::cout << "（按任意键跳过开场动画）\n";
+
+	// === 第一行 ===
 	platform::system_color(0x47);
 	puts("[           -在深渊-           ]");
-	Lwait();
+	platform::sleep_ms(500); if (check_skip()) return;
 	platform::system_color(0x74);
-	Swait();
+	platform::sleep_ms(20);  if (check_skip()) return;
 	platform::system_color(0x47);
-	Mwait();
+	platform::sleep_ms(300); if (check_skip()) return;
 	platform::system_color(0x74);
-	Swait();
+	platform::sleep_ms(20);  if (check_skip()) return;
 	platform::system_color(0x47);
-	Mwait();
+	platform::sleep_ms(300); if (check_skip()) return;
 	platform::clear_screen();
+
+	// === 第二行 ===
 	puts("[         -In the Abyss-         ]");
-	Lwait();
+	platform::sleep_ms(500); if (check_skip()) return;
 	platform::system_color(0x74);
-	Swait();
+	platform::sleep_ms(20);  if (check_skip()) return;
 	platform::system_color(0x47);
-	Mwait();
+	platform::sleep_ms(300); if (check_skip()) return;
 	platform::system_color(0x74);
-	Swait();
+	platform::sleep_ms(20);  if (check_skip()) return;
 	platform::system_color(0x47);
-	Mwait();
+	platform::sleep_ms(300); if (check_skip()) return;
 	platform::clear_screen();
+
+	// === 第三行 ===
 	puts("[     Made By 齂怪物、地有小到中雨     ]");
-	Lwait();
+	platform::sleep_ms(500); if (check_skip()) return;
 	platform::system_color(0x74);
-	Swait();
+	platform::sleep_ms(20);  if (check_skip()) return;
 	platform::system_color(0x47);
-	Mwait();
+	platform::sleep_ms(300); if (check_skip()) return;
 	platform::system_color(0x74);
-	Swait();
+	platform::sleep_ms(20);  if (check_skip()) return;
 	platform::system_color(0x47);
-	Mwait();
+	platform::sleep_ms(300); if (check_skip()) return;
 	platform::clear_screen();
 }
