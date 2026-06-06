@@ -1,6 +1,7 @@
 #ifndef GAME_STATE_H
 #define GAME_STATE_H
 
+#include <iostream>
 #include <map>
 #include <string>
 #include <vector>
@@ -38,6 +39,43 @@ struct GameState {
         auto it = std::find(inventory.begin(), inventory.end(), item);
         if (it != inventory.end()) inventory.erase(it);
     }
+
+    // ===== 任务系统 =====
+    struct QuestCondition {
+        std::string flag;
+        bool expected = true;
+    };
+
+    struct QuestDef {
+        std::string id;
+        std::string title;
+        std::vector<QuestCondition> conditions;
+        std::string completion_flag;
+    };
+
+    void register_quest(const QuestDef& quest) {
+        quest_defs_.push_back(quest);
+    }
+
+    void check_quests() {
+        for (auto& qd : quest_defs_) {
+            if (check_flag(qd.completion_flag)) continue;
+            bool all_met = true;
+            for (auto& c : qd.conditions) {
+                if (check_flag(c.flag) != c.expected) {
+                    all_met = false;
+                    break;
+                }
+            }
+            if (all_met) {
+                set_flag(qd.completion_flag);
+                std::cout << "✅ 任务完成：【" << qd.title << "】\n";
+            }
+        }
+    }
+
+private:
+    std::vector<QuestDef> quest_defs_;
 };
 
 #endif

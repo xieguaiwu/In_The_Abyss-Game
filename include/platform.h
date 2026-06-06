@@ -1,36 +1,45 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
-// 跨平台支持头文件 - 支持Windows、macOS和Linux
-// C++17标准
+// ============================================================================
+// 跨平台支持头文件 — 支持 Windows / macOS / Linux
+// C++17 标准，零外部依赖
+// ============================================================================
 
 #include <iostream>
 #include <string>
 #include <cstdio>
+#include <cstdlib>   // std::atoi, std::getenv
+#include <thread>    // std::this_thread::sleep_for
+#include <chrono>    // std::chrono::milliseconds
+#include <functional>
 
-// 平台检测
+// ============ 平台检测 ============
 #if defined(_WIN32) || defined(_WIN64)
-#define PLATFORM_WINDOWS
-#include <windows.h>
-#include <conio.h>
+  #define PLATFORM_WINDOWS
+  #include <windows.h>
+  #include <conio.h>       // Windows 原生 _getch()
 #elif defined(__APPLE__)
-#define PLATFORM_MAC
-#define PLATFORM_POSIX
-#include <termios.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
-#include <fcntl.h>
+  #define PLATFORM_MAC
+  #define PLATFORM_POSIX
+  // macOS: 需要 _DARWIN_C_SOURCE 获取 TIOCGWINSZ 等 POSIX 扩展
+  #ifndef _DARWIN_C_SOURCE
+    #define _DARWIN_C_SOURCE
+  #endif
+  #include <termios.h>
+  #include <unistd.h>
+  #include <sys/ioctl.h>   // TIOCGWINSZ
+  #include <fcntl.h>
 #else
-#define PLATFORM_LINUX
-#define PLATFORM_POSIX
-#include <termios.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
-#include <fcntl.h>
+  #define PLATFORM_LINUX
+  #define PLATFORM_POSIX
+  #include <termios.h>
+  #include <unistd.h>
+  #include <sys/ioctl.h>
+  #include <fcntl.h>
 #endif
 
-// ============ 控制台颜色定义 ============
-// 前景色
+// ============ 控制台颜色定义（ANSI 标准） ============
 #define COLOR_BLACK   30
 #define COLOR_RED     31
 #define COLOR_GREEN   32
@@ -40,7 +49,6 @@
 #define COLOR_CYAN    36
 #define COLOR_WHITE   37
 
-// 背景色 (+10)
 #define BG_BLACK   40
 #define BG_RED     41
 #define BG_GREEN   42
@@ -54,12 +62,12 @@
 
 namespace platform {
 
-// 延时函数（毫秒）
+// 延时函数（毫秒）— 跨平台，无弃用警告
 inline void sleep_ms(int milliseconds) {
 #ifdef PLATFORM_WINDOWS
 	Sleep(milliseconds);
 #else
-	usleep(milliseconds * 1000);
+	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 #endif
 }
 
@@ -86,82 +94,41 @@ inline void gotoxy(int x, int y) {
 #endif
 }
 
-// 设置控制台颜色（前景色和背景色）
+// 设置控制台颜色（前景色 + 背景色）
 inline void set_color(int foreground, int background = 0) {
 #ifdef PLATFORM_WINDOWS
-	// Windows颜色映射
 	int win_fg = 0, win_bg = 0;
-
 	switch (foreground) {
-	case COLOR_BLACK:
-		win_fg = 0;
-		break;
-	case COLOR_RED:
-		win_fg = FOREGROUND_RED;
-		break;
-	case COLOR_GREEN:
-		win_fg = FOREGROUND_GREEN;
-		break;
-	case COLOR_YELLOW:
-		win_fg = FOREGROUND_RED | FOREGROUND_GREEN;
-		break;
-	case COLOR_BLUE:
-		win_fg = FOREGROUND_BLUE;
-		break;
-	case COLOR_MAGENTA:
-		win_fg = FOREGROUND_RED | FOREGROUND_BLUE;
-		break;
-	case COLOR_CYAN:
-		win_fg = FOREGROUND_GREEN | FOREGROUND_BLUE;
-		break;
-	case COLOR_WHITE:
-		win_fg = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
-		break;
-	default:
-		win_fg = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
-		break;
+	case COLOR_BLACK:   win_fg = 0;                                  break;
+	case COLOR_RED:     win_fg = FOREGROUND_RED;                    break;
+	case COLOR_GREEN:   win_fg = FOREGROUND_GREEN;                  break;
+	case COLOR_YELLOW:  win_fg = FOREGROUND_RED | FOREGROUND_GREEN; break;
+	case COLOR_BLUE:    win_fg = FOREGROUND_BLUE;                   break;
+	case COLOR_MAGENTA: win_fg = FOREGROUND_RED | FOREGROUND_BLUE;  break;
+	case COLOR_CYAN:    win_fg = FOREGROUND_GREEN | FOREGROUND_BLUE;break;
+	case COLOR_WHITE:   win_fg = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE; break;
+	default:            win_fg = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE; break;
 	}
-
 	switch (background) {
-	case BG_BLACK:
-		win_bg = 0;
-		break;
-	case BG_RED:
-		win_bg = BACKGROUND_RED;
-		break;
-	case BG_GREEN:
-		win_bg = BACKGROUND_GREEN;
-		break;
-	case BG_YELLOW:
-		win_bg = BACKGROUND_RED | BACKGROUND_GREEN;
-		break;
-	case BG_BLUE:
-		win_bg = BACKGROUND_BLUE;
-		break;
-	case BG_MAGENTA:
-		win_bg = BACKGROUND_RED | BACKGROUND_BLUE;
-		break;
-	case BG_CYAN:
-		win_bg = BACKGROUND_GREEN | BACKGROUND_BLUE;
-		break;
-	case BG_WHITE:
-		win_bg = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE;
-		break;
-	default:
-		win_bg = 0;
-		break;
+	case BG_BLACK:   win_bg = 0;                                           break;
+	case BG_RED:     win_bg = BACKGROUND_RED;                              break;
+	case BG_GREEN:   win_bg = BACKGROUND_GREEN;                            break;
+	case BG_YELLOW:  win_bg = BACKGROUND_RED | BACKGROUND_GREEN;           break;
+	case BG_BLUE:    win_bg = BACKGROUND_BLUE;                             break;
+	case BG_MAGENTA: win_bg = BACKGROUND_RED | BACKGROUND_BLUE;            break;
+	case BG_CYAN:    win_bg = BACKGROUND_GREEN | BACKGROUND_BLUE;          break;
+	case BG_WHITE:   win_bg = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE; break;
+	default:         win_bg = 0;                                           break;
 	}
-
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
 	                        FOREGROUND_INTENSITY | win_fg | win_bg);
 #else
-	// Unix/POSIX使用ANSI转义序列
 	std::cout << "\033[" << foreground << ";" << (background + 10) << "m";
 	std::cout.flush();
 #endif
 }
 
-// 重置颜色为默认
+// 重置颜色
 inline void reset_color() {
 #ifdef PLATFORM_WINDOWS
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
@@ -172,73 +139,30 @@ inline void reset_color() {
 #endif
 }
 
-// 兼容旧代码的color函数 (使用简单的颜色代码)
-// 1=红 2=绿 3=蓝 4=黄 5=紫 6=青 7=白
+// 兼容旧代码：1=红 2=绿 3=蓝 4=黄 5=紫 6=青 7=白
 inline void color(int colorCode) {
 #ifdef PLATFORM_WINDOWS
 	int attr = FOREGROUND_INTENSITY;
 	switch (colorCode) {
-	case 1:
-		attr |= FOREGROUND_RED;
-		break;
-	case 2:
-		attr |= FOREGROUND_GREEN;
-		break;
-	case 3:
-		attr |= FOREGROUND_BLUE;
-		break;
-	case 4:
-		attr |= FOREGROUND_RED | FOREGROUND_GREEN;
-		break;
-	case 5:
-		attr |= FOREGROUND_RED | FOREGROUND_BLUE;
-		break;
-	case 6:
-		attr |= FOREGROUND_GREEN | FOREGROUND_BLUE;
-		break;
-	case 7:
-		attr |= FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
-		break;
-	default:
-		attr = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
-		break;
+	case 1:  attr |= FOREGROUND_RED;                                    break;
+	case 2:  attr |= FOREGROUND_GREEN;                                  break;
+	case 3:  attr |= FOREGROUND_BLUE;                                   break;
+	case 4:  attr |= FOREGROUND_RED | FOREGROUND_GREEN;                 break;
+	case 5:  attr |= FOREGROUND_RED | FOREGROUND_BLUE;                  break;
+	case 6:  attr |= FOREGROUND_GREEN | FOREGROUND_BLUE;                break;
+	case 7:  attr |= FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE; break;
+	default: attr  = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE; break;
 	}
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), attr);
 #else
-	int fg = 37;
-	switch (colorCode) {
-	case 1:
-		fg = 31;
-		break; // 红
-	case 2:
-		fg = 32;
-		break; // 绿
-	case 3:
-		fg = 34;
-		break; // 蓝
-	case 4:
-		fg = 33;
-		break; // 黄
-	case 5:
-		fg = 35;
-		break; // 紫
-	case 6:
-		fg = 36;
-		break; // 青
-	case 7:
-		fg = 37;
-		break; // 白
-	default:
-		fg = 37;
-		break;
-	}
+	static constexpr int ansi_map[8] = {37, 31, 32, 34, 33, 35, 36, 37};
+	int fg = (colorCode >= 0 && colorCode <= 7) ? ansi_map[colorCode] : 37;
 	std::cout << "\033[1;" << fg << "m";
 	std::cout.flush();
 #endif
 }
 
-// 兼容system("color XX")的颜色设置
-// 格式：第一个十六进制数字是背景色，第二个是前景色
+// 兼容 system("color XX") — 两个十六进制数字，第一个背景，第二个前景
 inline void system_color(int code) {
 #ifdef PLATFORM_WINDOWS
 	char cmd[16];
@@ -248,52 +172,20 @@ inline void system_color(int code) {
 	int bg = (code >> 4) & 0x0F;
 	int fg = code & 0x0F;
 
-	// 映射到ANSI颜色
-	auto mapColor = [](int c) -> int {
-		switch (c) {
-		case 0:
-			return 30; // 黑
-		case 1:
-			return 34; // 蓝
-		case 2:
-			return 32; // 绿
-		case 3:
-			return 36; // 青
-		case 4:
-			return 31; // 红
-		case 5:
-			return 35; // 紫
-		case 6:
-			return 33; // 黄
-		case 7:
-			return 37; // 白
-		case 8:
-			return 37; // 灰(当作白)
-		case 9:
-			return 34; // 亮蓝
-		case 10:
-			return 32; // 亮绿
-		case 11:
-			return 36; // 亮青
-		case 12:
-			return 31; // 亮红
-		case 13:
-			return 35; // 亮紫
-		case 14:
-			return 33; // 亮黄
-		case 15:
-			return 37; // 亮白
-		default:
-			return 37;
+	std::function<int(int)> map_color = [&map_color](int c) -> int {
+		if (c <= 7) {
+			static constexpr int ansi[8] = {30, 34, 32, 36, 31, 35, 33, 37};
+			return ansi[c];
 		}
+		return map_color(c - 8);
 	};
 
-	std::cout << "\033[" << mapColor(fg) << ";" << (mapColor(bg) + 10) << "m";
+	std::cout << "\033[" << map_color(fg) << ";" << (map_color(bg) + 10) << "m";
 	std::cout.flush();
 #endif
 }
 
-// 隐藏光标
+// 光标控制
 inline void hide_cursor() {
 #ifdef PLATFORM_WINDOWS
 	CONSOLE_CURSOR_INFO ci;
@@ -308,7 +200,6 @@ inline void hide_cursor() {
 #endif
 }
 
-// 显示光标
 inline void show_cursor() {
 #ifdef PLATFORM_WINDOWS
 	CONSOLE_CURSOR_INFO ci;
@@ -323,128 +214,104 @@ inline void show_cursor() {
 #endif
 }
 
-// 获取终端大小
+// 获取终端窗口大小
 inline void get_terminal_size(int& width, int& height) {
 #ifdef PLATFORM_WINDOWS
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi)) {
-		width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-		height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+		width  = csbi.srWindow.Right  - csbi.srWindow.Left + 1;
+		height = csbi.srWindow.Bottom - csbi.srWindow.Top  + 1;
 	} else {
-		width = 80;
-		height = 24;
+		width = 80; height = 24;
 	}
 #else
 	struct winsize w;
-	int result = ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-	if (result == 0 && w.ws_col > 0 && w.ws_row > 0) {
-		width = w.ws_col;
+	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0 && w.ws_col > 0 && w.ws_row > 0) {
+		width  = w.ws_col;
 		height = w.ws_row;
 	} else {
-		// 无法获取终端大小时使用默认值
-		// 尝试从环境变量获取
 		const char* cols = std::getenv("COLUMNS");
 		const char* lines = std::getenv("LINES");
 		if (cols && lines) {
-			width = std::atoi(cols);
+			width  = std::atoi(cols);
 			height = std::atoi(lines);
 		} else {
-			width = 80;
-			height = 24;
+			width = 80; height = 24;
 		}
 	}
 #endif
-	// 确保返回值在合理范围内
-	if (width <= 0) width = 80;
+	if (width  <= 0) width  = 80;
 	if (height <= 0) height = 24;
 }
 
-// 全屏（仅Windows有效，Linux下忽略）
+// 全屏 — 仅 Windows 有控制台 API 支持
 inline void full_screen() {
 #ifdef PLATFORM_WINDOWS
 	HWND hwnd = GetForegroundWindow();
 	int cx = GetSystemMetrics(SM_CXSCREEN);
 	int cy = GetSystemMetrics(SM_CYSCREEN);
-	LONG l_WinStyle = GetWindowLong(hwnd, GWL_STYLE);
 	SetWindowPos(hwnd, HWND_TOP, 0, 0, cx, cy, 0);
 #endif
-	// macOS/Linux下全屏需要终端支持，这里不做处理
 }
 
 } // namespace platform
 
-// ============ getch() 实现 ============
+// ============ getch() 键盘输入（跨平台） ============
+
 #ifdef PLATFORM_POSIX
 namespace {
-// POSIX下getch的实现
+
 inline int getch_impl() {
 	struct termios oldattr, newattr;
 	int ch;
 
-	// 获取当前终端设置
+	// 保存当前终端属性，设为原始模式
 	tcgetattr(STDIN_FILENO, &oldattr);
 	newattr = oldattr;
-	// 设置为非规范模式，禁用回显
-	newattr.c_lflag &= ~(ICANON | ECHO);
-	// 第一个字符阻塞等待
-	newattr.c_cc[VMIN] = 1;
-	newattr.c_cc[VTIME] = 0;
+	newattr.c_lflag &= ~(ICANON | ECHO);  // 非行缓冲，无回显
+	newattr.c_cc[VMIN]  = 1;              // 至少读 1 字节
+	newattr.c_cc[VTIME] = 0;              // 无限等待
 	tcsetattr(STDIN_FILENO, TCSANOW, &newattr);
 
 	ch = getchar();
 
-	// 检查方向键（POSIX下方向键是3个字符的序列 ESC [ A/B/C/D）
-	if (ch == 27) { // ESC
-		// 切换到非阻塞模式读取后续字符
-		newattr.c_cc[VMIN] = 0;
-		newattr.c_cc[VTIME] = 1; // 0.1秒超时
+	// 检查方向键序列: ESC [ A/B/C/D (3 字节)
+	if (ch == 27) {  // ESC
+		newattr.c_cc[VMIN]  = 0;
+		newattr.c_cc[VTIME] = 1;  // 0.1 秒超时
 		tcsetattr(STDIN_FILENO, TCSANOW, &newattr);
 
 		int ch2 = getchar();
 		if (ch2 == '[') {
 			int ch3 = getchar();
+			tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
 			switch (ch3) {
-			case 'A':
-				tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
-				return 'H'; // 上 - 映射到原来的定义
-			case 'B':
-				tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
-				return 'P'; // 下
-			case 'C':
-				tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
-				return 'M'; // 右
-			case 'D':
-				tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
-				return 'K'; // 左
+			case 'A': return 'H';  // 上
+			case 'B': return 'P';  // 下
+			case 'C': return 'M';  // 右
+			case 'D': return 'K';  // 左
+			default:  return 27;
 			}
 		}
-		// 如果不是方向键序列，返回 ESC
 	}
 
-	// 恢复终端设置
 	tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
 	return ch;
 }
-}
-// 在POSIX下重新定义getch
+
+} // anonymous namespace
+
 #define getch getch_impl
-#endif
 
-// ============ 兼容性宏定义 ============
-// 方向键定义（与原代码保持一致）
-#ifndef PLATFORM_WINDOWS
-#undef left
-#undef right
-#undef up
-#undef down
-#endif
+#endif // PLATFORM_POSIX
 
-#define left 'K'
-#define right 'M'
-#define up 'H'
-#define down 'P'
+// ============ 方向键映射 ============
+constexpr char KEY_LEFT  = 'K';
+constexpr char KEY_RIGHT = 'M';
+constexpr char KEY_UP    = 'H';
+constexpr char KEY_DOWN  = 'P';
 
-// Sleep兼容
+// ============ Sleep 兼容宏 ============
 #ifdef PLATFORM_POSIX
 #define Sleep(ms) platform::sleep_ms(ms)
 #endif

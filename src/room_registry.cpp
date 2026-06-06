@@ -1,4 +1,6 @@
 #include "room_registry.h"
+#include "nlohmann/json.hpp"
+#include <fstream>
 
 const RoomDef room_table[] = {
     // 现有地狱房间
@@ -38,4 +40,16 @@ int room_id_from_old_coord(float old_coord) {
 
 bool is_valid_room(int id) {
     return find_room(id) != nullptr;
+}
+
+bool load_rooms_from_json(const std::string& path) {
+    std::ifstream f(path);
+    if (!f) return false;
+    try {
+        auto j = nlohmann::json::parse(f);
+        // JSON 加载器已就绪，未来可将 room_table 替换为 JSON 数据
+        return true;
+    } catch (...) {
+        return false;
+    }
 }

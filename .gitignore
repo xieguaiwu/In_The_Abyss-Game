@@ -1,28 +1,49 @@
-# 编译输出
-Abyss
-Abyss-debug
-Abyss.exe
-obj/
-obj/debug/
+# 在深渊 (In the Abyss) — .gitignore
 
-# 编辑器
+# 构建产物
+/Abyss
+/Abyss-debug
+Abyss.exe
+Abyss-debug.exe
+
+# 对象目录
+/obj/
+
+# IDE / 编辑器
 .vscode/
 .idea/
 *.swp
+*.swo
 *~
 
-# 系统文件
+# macOS 系统文件
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
-# 文档（不跟踪）
+# 编译中间文件
+*.o
+*.obj
+*.exe
+*.out
+*.app
+
+# 日志
+*.log
+
+# 本地文档（不上传）
+doc/
+session_context.md
+copr_packaging.md
+BUILD.md
+research.md
 在深渊.docx
 
-# COPR 打包指南（开发文档，不上传）
-copr_packaging.md
-
-# Session context（自动生成的会话上下文快照）
-session_context.md
-
-# 本地中文文档（不上传）
-doc/
+# 运行时数据（可选，代码含 fallback）
+data/
+translations/
+scripts/

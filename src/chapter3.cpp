@@ -123,7 +123,7 @@ void sy() {
 		puts("继续等待吗？（↑继续等 ↓离开）");
 		while (1) {
 			key = getch();
-			if (key == up) {
+			if (key == KEY_UP) {
 				text("你继续等……");
 				text("-黑暗和烈火赐给你乌黑的眼，如今它们冰冷如霜-", 1);
 				GameState::instance().set_flag("look_clear");
@@ -155,7 +155,7 @@ void sy() {
 				text("解锁成就【不要……眨眼】", 1); GameState::instance().visit("achievements");
 				break;
 			}
-			else if (key == down) break;
+			else if (key == KEY_DOWN) break;
 		}
 	}
 }

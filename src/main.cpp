@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <cmath>
+#include <cstdlib>
+#include <ctime>
 #include "platform.h"
 #include "common_vars.h"
 #include "functions.h"
@@ -81,7 +83,7 @@ void choice() {
 }
 
 int main() {
-	srand(time(nullptr));
+	std::srand(static_cast<unsigned>(std::time(nullptr)));
 	while (true) {
 		if (ingame == false) choice();
 		platform::system_color(0xC7);

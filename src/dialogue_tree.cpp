@@ -1,8 +1,10 @@
 #include <iostream>
 #include <algorithm>
+#include <fstream>
 #include "dialogue_tree.h"
 #include "platform.h"
 #include "game_state.h"
+#include "nlohmann/json.hpp"
 
 DialogueTree::DialogueTree(const std::vector<DialogueNode>& nodes)
     : nodes_(nodes), current_node_(-1), active_(false) {}
@@ -15,6 +17,46 @@ void DialogueTree::load(const std::vector<DialogueNode>& nodes) {
 void DialogueTree::reset() {
     current_node_ = -1;
     active_ = false;
+}
+
+bool DialogueTree::load_from_json(const std::string& path) {
+    std::ifstream f(path);
+    if (!f) return false;
+    try {
+        auto j = nlohmann::json::parse(f);
+        std::vector<DialogueNode> nodes;
+        for (auto& node_j : j["nodes"]) {
+            DialogueNode node;
+            node.id = node_j["id"].get<int>();
+            if (node_j.contains("speaker"))
+                node.speaker = node_j["speaker"].get<std::string>();
+            node.text = node_j["text"].get<std::string>();
+            if (node_j.contains("on_enter_flag"))
+                node.on_enter_flag = node_j["on_enter_flag"].get<std::string>();
+            if (node_j.contains("choices")) {
+                for (auto& opt_j : node_j["choices"]) {
+                    DialogueOption opt;
+                    std::string ks = opt_j["key"].get<std::string>();
+                    opt.key = ks[0];
+                    opt.label = opt_j["label"].get<std::string>();
+                    opt.next_node_id = opt_j["next"].get<int>();
+                    if (opt_j.contains("set_flag"))
+                        opt.set_flag = opt_j["set_flag"].get<std::string>();
+                    if (opt_j.contains("required_flag"))
+                        opt.required_flag = opt_j["required_flag"].get<std::string>();
+                    node.options.push_back(opt);
+                }
+            }
+            nodes.push_back(node);
+        }
+        if (!nodes.empty()) {
+            load(nodes);
+            return true;
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Dialogue JSON parse error: " << e.what() << "\n";
+    }
+    return false;
 }
 
 void DialogueTree::start(int root_node_id) {

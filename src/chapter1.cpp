@@ -134,7 +134,7 @@ void a1a() {
 			random_val = r(0, 5);
 			while (1) {
 				key = getch();
-				if (key == up) {
+				if (key == KEY_UP) {
 					if (random_val == 2) {
 						GameState::instance().set_flag("shame");
 						text("【判定成功！】你脱下了内裤。人们路过你，有人对你指指点点，但你感到十分自信");
@@ -154,7 +154,7 @@ void a1a() {
 						break;
 					}
 				}
-				if (key == down) {
+				if (key == KEY_DOWN) {
 					text("你尴尬地穿上了刚刚脱下的裤子");
 					break;
 				}
@@ -185,10 +185,10 @@ void a1() {
 		std::cout << "已读取检查点（↑进入检查点 ↓重新开始本章进度）\n";
 		while (1) {
 			key = getch();
-			if (key == up) {
+			if (key == KEY_UP) {
 				platform::clear_screen(); city(); a2(); break;
 			}
-			else if (key == down) break;
+			else if (key == KEY_DOWN) break;
 		}
 	}
 	pause_game(1);

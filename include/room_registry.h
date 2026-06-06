@@ -41,5 +41,6 @@ extern const int room_table_size;
 const RoomDef* find_room(int id);
 int room_id_from_old_coord(float old_coord);
 bool is_valid_room(int id);
+bool load_rooms_from_json(const std::string& path);
 
 #endif

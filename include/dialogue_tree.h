@@ -26,6 +26,7 @@ public:
     explicit DialogueTree(const std::vector<DialogueNode>& nodes);
 
     void load(const std::vector<DialogueNode>& nodes);
+    bool load_from_json(const std::string& path);
     void start(int root_node_id);
     void reset();
     bool is_active() const { return active_; }

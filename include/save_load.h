@@ -2,6 +2,7 @@
 #define SAVE_LOAD_H
 
 #include <string>
+#include <vector>
 
 bool save_game(const std::string& slot_name);
 bool load_game(const std::string& slot_name);
